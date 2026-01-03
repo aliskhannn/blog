@@ -1,0 +1,16 @@
+{{ define "main" }}
+<header class="page-head">
+	<h1 class="page-title">{{ .Title }}</h1>
+</header>
+
+<div class="postlist">
+	{{ range .Pages }}
+	<a class="postitem" href="{{ .RelPermalink }}">
+		<span class="postitem__title">{{ .Title }}</span>
+		<time class="postitem__date" datetime="{{ .Date.Format " 2006-01-02" }}">
+			{{ time.Format "2 Jan 2006" .Date }}
+		</time>
+	</a>
+	{{ end }}
+</div>
+{{ end }}

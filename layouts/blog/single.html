@@ -1,0 +1,40 @@
+{{ define "main" }}
+<article class="post">
+	<header class="post__header">
+		<h1 class="post__title">{{ .Title }}</h1>
+
+		<div class="post__meta">
+			<span class="meta-item">
+				{{ partial "icons/user.svg" . }}
+				<span>
+					{{ with .Params.authors }}{{ index . 0 }}{{ else }}{{ .Site.Params.author }}{{ end }}
+				</span>
+			</span>
+
+			<span class="meta-item">
+				{{ partial "icons/calendar.svg" . }}
+				<time datetime="{{ .Date.Format " 2006-01-02" }}">
+					{{ time.Format "2 Jan 2006" .Date }}
+				</time>
+			</span>
+
+			<span class="meta-item">
+				{{ partial "icons/clock.svg" . }}
+				<span>{{ .ReadingTime }} мин чтения</span>
+			</span>
+		</div>
+
+		{{ with .Params.tags }}
+		<div class="post__tags">
+			{{ range . }}
+			<a class="tag" href='{{ (print "tags/" (. | urlize) "/" ) | relURL }}'>{{ . }}</a>
+			{{ end }}
+		</div>
+		{{ end }}
+	</header>
+
+	<div class="post__content prose">
+		{{ .Content }}
+	</div>
+</article>
+{{ end }}

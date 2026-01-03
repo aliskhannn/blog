@@ -1,0 +1,44 @@
+baseURL: "/"
+languageCode: "ru-RU"
+defaultContentLanguage: "ru"
+title: "Aliskhan's Blog"
+pagination:
+  pagerSize: 10
+
+params:
+  author: "Aliskhan Khutiev"
+  info: "Go Backend Developer"
+  description: "Заметки про Go, backend и проекты."
+  keywords: "blog,backend,developer,personal"
+
+  social:
+    email: "aliskhandev@gmail.com"
+    telegram: "https://t.me/aliskhannn"
+    github: "https://github.com/aliskhannn"
+    phone: "+7 (938) 014-72-43"
+
+markup:
+  highlight:
+    codeFences: true
+    guessSyntax: false
+    style: github-dark
+    noClasses: true
+    lineNos: false
+
+menus:
+  main:
+    - name: "Обо мне"
+      pageRef: "/about"
+      weight: 10
+    - name: "Проекты"
+      pageRef: "/projects"
+      weight: 20
+    - name: "Блог"
+      pageRef: "/blog"
+      weight: 30
+    - name: "Связаться"
+      pageRef: "/contact"
+      weight: 40
+
+taxonomies:
+  tag: "tags"

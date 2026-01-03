@@ -1,0 +1,47 @@
+<header class="header">
+	<div class="container header__inner">
+		<a class="brand" href='{{ "/" | relURL }}'>{{ .Site.Title }}</a>
+
+		<!-- Desktop nav -->
+		<nav class="nav nav--desktop">
+			{{ range .Site.Menus.main }}
+			<a class="nav__link" href="{{ .URL }}">{{ .Name }}</a>
+			{{ end }}
+
+			<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">
+				<span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
+					{{ partial "icons/sun.svg" . }}
+				</span>
+				<span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
+					{{ partial "icons/moon.svg" . }}
+				</span>
+			</button>
+		</nav>
+
+		<!-- Mobile burger -->
+		<details class="burger">
+			<summary class="burger__btn" aria-label="Меню">
+				{{ partial "icons/menu.svg" . }}
+			</summary>
+
+			<nav class="burger__panel">
+				{{ range .Site.Menus.main }}
+				<a class="burger__link" href="{{ .URL }}">{{ .Name }}</a>
+				{{ end }}
+
+				<button class="burger__theme" id="theme-toggle-mobile" type="button">
+					<span class="burger__theme-text">Тема</span>
+
+					<span class="burger__theme-icon" aria-hidden="true">
+						<span class="theme-toggle__icon theme-toggle__icon--sun">
+							{{ partial "icons/sun.svg" . }}
+						</span>
+						<span class="theme-toggle__icon theme-toggle__icon--moon">
+							{{ partial "icons/moon.svg" . }}
+						</span>
+					</span>
+				</button>
+			</nav>
+		</details>
+	</div>
+</header>
