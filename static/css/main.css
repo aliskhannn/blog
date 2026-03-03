@@ -33,7 +33,12 @@ body {
 
 body {
   margin: 0;
-  font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font:
+    16px/1.6 system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Arial;
   background: var(--bg);
   color: var(--text);
 }
@@ -77,9 +82,30 @@ a:hover {
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+}
+
+.logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+}
+
+.logo-light {
+  display: none;
+}
+
+/* Dark theme */
+html[data-theme="dark"] .logo-dark {
+  display: none;
+}
+
+html[data-theme="dark"] .logo-light {
+  display: block;
 }
 
 .nav {
@@ -112,7 +138,9 @@ a:hover {
   justify-content: center;
 
   cursor: pointer;
-  transition: background-color 200ms ease, border-color 200ms ease,
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
     color 200ms ease;
 }
 
@@ -237,8 +265,9 @@ a:hover {
 }
 
 .prose code {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
+  font-family:
+    SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
   font-size: 0.95em;
   background: rgba(148, 163, 184, 0.14);
   padding: 0.1em 0.35em;

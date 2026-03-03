@@ -10,6 +10,8 @@ params:
   info: "Go Backend Developer"
   description: "Заметки про Go, backend и проекты."
   keywords: "blog,backend,developer,personal"
+  logoLight: "images/logo-light.png"
+  logoDark: "images/logo-dark.png"
 
   social:
     email: "aliskhandev@gmail.com"
