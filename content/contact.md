@@ -3,7 +3,6 @@ title: "Контакты"
 layout: "page"
 ---
 
-- Email: mailto:aliskhandev@gmail.com
-- Telegram: https://t.me/aliskhannn
-- GitHub: https://github.com/aliskhannn
-- Телефон: tel:+7 (938) 014-72-43
+- Email: [aliskhandev@gmail.com](mailto:aliskhandev@gmail.com)
+- Telegram: [t.me/aliskhannn](https://t.me/aliskhannn)
+- GitHub: [github.com/aliskhannn](https://github.com/aliskhannn)

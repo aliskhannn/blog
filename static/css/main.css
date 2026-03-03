@@ -90,22 +90,9 @@ a:hover {
 }
 
 .logo {
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
-}
-
-.logo-light {
-  display: none;
-}
-
-/* Dark theme */
-html[data-theme="dark"] .logo-dark {
-  display: none;
-}
-
-html[data-theme="dark"] .logo-light {
-  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
 }
 
 .nav {
