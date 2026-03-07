@@ -150,8 +150,9 @@ pkg/
 ```bash
 tests/
 └── integration/
-    ├── user_test.go
-    ├── posts_test.go
+    └── repository/
+        ├── user_test.go
+        ├── post_test.go
 ```
 
 Здесь обычно лежат тесты, которые поднимают реальную базу данных, HTTP-сервер или другие внешние зависимости.
@@ -271,7 +272,7 @@ internal/
     ├── postgres/
     │   ├── pool.go
     │   ├── errors.go
-    │   ├── question_repository.go
+    │   ├── post_repository.go
     │   ├── user_repository.go
     │   └── refresh_token_repository.go
     ├── redis/
@@ -323,8 +324,7 @@ func (r *UserRepo) GetByID(ctx context.Context, id int64) (*domain.User, error) 
 
 > **Важно**
 >
-> Интерфейс репозитория обычно не лежит рядом с реализацией.  
-> Я стараюсь держать его в пакете, где он используется — чаще всего в `service`.
+> Интерфейсы следует помещать в пакет, где они используются, а не в пакет, где реализуются. Это упрощает читаемость кода и снижает зависимость пакетов друг от друга.
 
 ---
 
@@ -345,7 +345,7 @@ internal/
     │   ├── mocks.go
     │   ├── service.go
     │   └── service_test.go
-    ├── question/
+    ├── post/
     │   ├── errors.go
     │   ├── interfaces.go
     │   ├── mocks.go
