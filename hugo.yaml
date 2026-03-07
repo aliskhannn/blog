@@ -32,15 +32,12 @@ menus:
     - name: "Обо мне"
       pageRef: "/about"
       weight: 10
-    - name: "Проекты"
-      pageRef: "/projects"
-      weight: 20
     - name: "Блог"
       pageRef: "/blog"
-      weight: 30
+      weight: 20
     - name: "Связаться"
       pageRef: "/contact"
-      weight: 40
+      weight: 30
 
 taxonomies:
   tag: "tags"

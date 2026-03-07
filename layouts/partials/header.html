@@ -2,7 +2,7 @@
 	<div class="container header__inner">
 		<a class="brand" href='{{ "/" | relURL }}'>
 
-			<img src="{{ .Site.Params.logoDark | relURL }}" class="logo logo-dark" alt="logo" />
+			<!--<img src="{{ .Site.Params.logoDark | relURL }}" class="logo logo-dark" alt="logo" />-->
 
 			<span class="brand-text">
 				{{ .Site.Title }}
@@ -10,11 +10,13 @@
 
 		</a>
 
-		<!-- Desktop nav -->
-		<nav class="nav nav--desktop">
-			{{ range .Site.Menus.main }}
-			<a class="nav__link" href="{{ .URL }}">{{ .Name }}</a>
-			{{ end }}
+		<div class="nav__wrapper">
+			<!-- Desktop nav -->
+			<nav class="nav nav--desktop">
+				{{ range .Site.Menus.main }}
+				<a class="nav__link" href="{{ .URL }}">{{ .Name }}</a>
+				{{ end }}
+			</nav>
 
 			<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">
 				<span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
@@ -24,33 +26,31 @@
 					{{ partial "icons/moon.svg" . }}
 				</span>
 			</button>
-		</nav>
 
-		<!-- Mobile burger -->
-		<details class="burger">
-			<summary class="burger__btn" aria-label="Меню">
-				{{ partial "icons/menu.svg" . }}
-			</summary>
+			<!-- Mobile burger -->
+			<details class="burger" id="burger-menu">
+				<summary class="burger__btn" aria-label="Меню">
+					{{ partial "icons/menu.svg" . }}
+				</summary>
 
-			<nav class="burger__panel">
-				<div class="burger__head">
-					<span class="burger__title">Меню</span>
+				<nav class="burger__panel">
+					<div class="burger__head">
+						<span class="burger__title">Меню</span>
 
-					<button class="theme-toggle burger__theme-iconbtn" id="theme-toggle-mobile" type="button"
-						aria-label="Переключить тему">
-						<span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
-							{{ partial "icons/sun.svg" . }}
-						</span>
-						<span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
-							{{ partial "icons/moon.svg" . }}
-						</span>
-					</button>
-				</div>
+						<button class="burger__close" aria-label="Закрыть меню">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+								stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M18 6L6 18" />
+								<path d="M6 6L18 18" />
+							</svg>
+						</button>
+					</div>
 
-				{{ range .Site.Menus.main }}
-				<a class="burger__link" href="{{ .URL }}">{{ .Name }}</a>
-				{{ end }}
-			</nav>
-		</details>
+					{{ range .Site.Menus.main }}
+					<a class="burger__link" href="{{ .URL }}">{{ .Name }}</a>
+					{{ end }}
+				</nav>
+			</details>
+		</div>
 	</div>
 </header>
