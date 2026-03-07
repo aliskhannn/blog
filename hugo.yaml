@@ -1,4 +1,4 @@
-baseURL: "/"
+baseURL: "https://aliskhan.ru/"
 languageCode: "ru-RU"
 defaultContentLanguage: "ru"
 title: "Aliskhan's Blog"
@@ -9,7 +9,7 @@ params:
   author: "Aliskhan Khutiev"
   info: "Go Backend Developer"
   description: "Заметки про Go, backend и проекты."
-  keywords: "blog,backend,developer,personal"
+  keywords: "golang, go, backend, backend developer, go backend, microservices, clean architecture, REST API, PostgreSQL, Redis, Kafka, RabbitMQ, docker, distributed systems, software engineering, programming blog"
   logoLight: "images/logo-light.png"
   logoDark: "images/logo-dark.png"
 
@@ -18,6 +18,11 @@ params:
     telegram: "https://t.me/aliskhannn"
     github: "https://github.com/aliskhannn"
     phone: "+7 (938) 014-72-43"
+
+sitemap:
+  changefreq: "weekly"
+  priority: 0.5
+  filename: "sitemap.xml"
 
 markup:
   highlight:
