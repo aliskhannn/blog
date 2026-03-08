@@ -3,7 +3,7 @@ title: "Как я сейчас структурирую сервис на Go"
 date: 2026-03-07T01:10:00+03:00
 draft: false
 description: "Практическая структура Go-проекта: слои, папки, где живут конфиг, логгер, домены, сервисы и доступ к данным."
-slug: "go-service-project-structure"
+slug: "go-project-structure"
 authors:
   - "Aliskhan Khutiev"
 tags: ["Go", "Backend", "Architecture", "Project Structure"]
@@ -40,7 +40,7 @@ myapp/
 ├── go.mod
 ├── go.sum
 └── Makefile
-````
+```
 
 Это не «единственно правильная» структура, а рабочий шаблон, который помогает не тонуть в хаосе.
 
@@ -125,10 +125,10 @@ migrations/
 
 Например:
 
-* телеграм-клиент для отправки сообщений;
-* retry / backoff утилиты;
-* небольшой HTTP-клиент с таймаутами и ретраями;
-* helpers работы со временем.
+- телеграм-клиент для отправки сообщений;
+- retry / backoff утилиты;
+- небольшой HTTP-клиент с таймаутами и ретраями;
+- helpers работы со временем.
 
 Пример:
 
@@ -140,6 +140,8 @@ pkg/
 ```
 
 Если понимаю, что пакет живёт только внутри конкретного приложения, оставляю его в `internal`, а не в `pkg`.
+
+Директория pkg не является официальным стандартом Go, но часто используется в open-source проектах для кода, который можно переиспользовать в других сервисах.
 
 ---
 
@@ -187,18 +189,19 @@ web/
 internal/
 ├── app/
 ├── config/
+├── delivery/
 ├── domain/
 ├── infra/
 ├── logger/
-├── service/
-└── delivery/
+├── repository
+└── service/
 ```
 
 Разберём папки по очереди.
 
 ---
 
-## internal/config
+### internal/config
 
 Здесь я собираю конфигурацию: читаю `config.yml` + `.env`, валидирую и отдаю уже готовую структуру.
 
@@ -212,7 +215,7 @@ internal/
 
 ---
 
-## internal/logger
+### internal/logger
 
 Единая настройка логгера: уровни, формат, вывод, поля по умолчанию.
 
@@ -224,9 +227,13 @@ internal/
 
 Логгер инициализируется один раз и дальше прокидывается по слоям, а не создаётся «по месту» в каждом пакете.
 
+Иногда логгер выносят в pkg, так как он может быть переиспользуемым компонентом.
+
+Однако если логгер используется только внутри одного сервиса и не планируется как отдельная библиотека, я обычно оставляю его в internal. В этом случае он остаётся частью приложения и не предназначен для импорта извне.
+
 ---
 
-## internal/domain
+### internal/domain
 
 Бизнес-модели: пользователи, посты, комментарии и т.п.
 
@@ -260,38 +267,88 @@ Domain-слой описывает **что существует в предме
 
 ---
 
-## internal/infra
+### internal/infra
 
-Доступ к данным и внешним сервисам: БД, кэш, файловые хранилища, брокеры сообщений и т.д.
+Слой инфраструктуры содержит **технические реализации работы с внешними системами**.
 
-Пример:
+Это могут быть:
+
+- инициализация соединений с базой данных;
+- клиенты Redis;
+- Kafka consumer / producer;
+- HTTP-клиенты внешних сервисов.
+
+Пример структуры:
 
 ```bash
 internal/
 └── infra/
     ├── postgres/
-    │   ├── pool.go
-    │   ├── errors.go
-    │   ├── post_repository.go
-    │   ├── user_repository.go
-    │   └── refresh_token_repository.go
+    │   └── pool.go
     ├── redis/
-    │   └── ...
+    │   └── client.go
     └── kafka/
-        └── ...
+        ├── consumer.go
+        └── producer.go
 ```
 
-Обычно здесь реализуются **репозитории** — адаптеры, которые переводят операции сервиса в конкретные запросы к базе данных.
+Например, инициализация пула соединений PostgreSQL:
 
-То есть сервис говорит:
+```go
+// internal/infra/postgres/pool.go
+func NewPool(cfg Config) (*pgxpool.Pool, error) {
+    poolConfig, err := pgxpool.ParseConfig(cfg.DSN)
+    if err != nil {
+        return nil, err
+    }
 
-> "создай пользователя"
+    poolConfig.MaxConns = int32(cfg.MaxConns)
 
-а repository превращает это в SQL-запрос.
+    return pgxpool.NewWithConfig(context.Background(), poolConfig)
+}
+```
 
-Например.
+---
 
-Интерфейс, который нужен сервису:
+### internal/repository
+
+Репозитории — это адаптер между сервисами и хранилищем данных.
+
+В отличие от инфраструктуры, репозиторий уже знает о доменных моделях, поэтому его обычно выделяют в отдельный слой.
+
+```bash
+internal/
+└── repository/
+    └── user/
+        └── user_repository.go
+```
+
+```go
+type UserRepo struct {
+    db *pgxpool.Pool
+}
+
+func (r *UserRepo) GetByID(ctx context.Context, id int64) (*domain.User, error) {
+    var user domain.User
+
+    query := `SELECT id, email FROM users WHERE id = $1`
+
+    err := r.db.QueryRow(ctx, query, id).
+        Scan(&user.ID, &user.Email)
+
+    return &user, err
+}
+```
+
+Здесь уже появляется:
+
+- SQL-запрос
+- таблица users
+- модель domain.User
+
+Поэтому такой код относится к слою доступа к данным.
+
+Интерфейс репозитория при этом обычно располагается рядом с сервисом, который его использует:
 
 ```go
 // internal/service/user/interfaces.go
@@ -300,35 +357,9 @@ type UserRepository interface {
 }
 ```
 
-А реализация находится в `infra`:
-
-```go
-// internal/infra/postgres/user_repository.go
-type UserRepo struct {
-    db *pgxpool.Pool // или *sql.DB
-}
-
-func (r *UserRepo) GetByID(ctx context.Context, id int64) (*domain.User, error) {
-    var user domain.User
-
-    query := `SELECT id, name FROM users WHERE id = $1`
-    err := r.db.QueryRow(ctx, query, id).
-        Scan(&user.ID, &user.Name)
-
-    return &user, err
-}
-```
-
-Так сервис зависит от интерфейса, а не от конкретной базы данных.
-Благодаря этому можно, например, заменить PostgreSQL на другую БД или подставить мок в тестах.
-
-> **Важно**
->
-> Интерфейсы следует помещать в пакет, где они используются, а не в пакет, где реализуются. Это упрощает читаемость кода и снижает зависимость пакетов друг от друга.
-
 ---
 
-## internal/service
+### internal/service
 
 Бизнес-логика поверх домена и репозиториев.
 
@@ -357,7 +388,7 @@ internal/
 
 ---
 
-## internal/delivery
+### internal/delivery
 
 Транспортный слой: HTTP-хендлеры, gRPC, Telegram-бот и всё, что отвечает за входящие запросы.
 
@@ -381,7 +412,99 @@ internal/
 
 ---
 
-## internal/app
+#### Пример разделения Kafka-инфраструктуры и обработчиков
+
+Хороший пример различия между инфраструктурой и прикладной логикой — работа с брокерами сообщений, например Kafka.
+
+Техническая реализация клиента Kafka относится к инфраструктуре.
+Она отвечает только за подключение к брокеру и получение сообщений.
+
+Структура может выглядеть так:
+
+```bash
+internal/
+└── infra/
+    └── kafka/
+        ├── consumer.go
+        └── producer.go
+```
+
+Например, простой consumer может выглядеть так:
+
+```go
+type Consumer struct {
+    reader *kafka.Reader
+}
+
+func (c *Consumer) Consume(ctx context.Context, handler func([]byte) error) error {
+    for {
+        msg, err := c.reader.ReadMessage(ctx)
+        if err != nil {
+            return err
+        }
+
+        if err := handler(msg.Value); err != nil {
+            return err
+        }
+    }
+}
+```
+
+Этот код ничего не знает о бизнес-событиях, доменных моделях или сервисах.
+Он просто читает сообщения из Kafka и передаёт их обработчику.
+
+Конкретные обработчики сообщений относятся уже к слою доставки (delivery), так как они являются точкой входа событий в приложение — аналогично HTTP-хендлерам.
+
+Структура может выглядеть так:
+
+```bash
+internal/
+└── delivery/
+    └── kafka/
+        └── order_created_handler.go
+```
+
+Пример обработчика:
+
+```go
+type OrderCreatedEvent struct {
+    OrderID string `json:"order_id"`
+}
+
+type OrderCreatedHandler struct {
+    orderService *service.OrderService
+}
+
+func (h *OrderCreatedHandler) Handle(msg []byte) error {
+    var event OrderCreatedEvent
+
+    if err := json.Unmarshal(msg, &event); err != nil {
+        return err
+    }
+
+    return h.orderService.ProcessOrder(event.OrderID)
+}
+```
+
+Такой обработчик уже знает:
+
+- структуру входящего события;
+- бизнес-смысл события;
+- какой сервис должен его обработать.
+
+Поэтому его логично относить к слою delivery, а не к инфраструктуре.
+
+В итоге поток обработки сообщения выглядит примерно так:
+
+```
+Kafka -> delivery/kafka -> service -> repository -> infra
+```
+
+Сообщение приходит из Kafka, обрабатывается delivery-слоем, затем передаётся в сервис, который выполняет бизнес-логику и при необходимости работает с хранилищем данных.
+
+---
+
+### internal/app
 
 Сборка приложения: инициализация зависимостей, запуск серверов, воркеров и фоновых задач.
 
@@ -403,20 +526,29 @@ internal/
 
 Я стараюсь держаться простого правила:
 
-* domain **не знает** про HTTP, SQL, Redis и т.п.;
-* service говорит с infra через интерфейсы;
-* delivery обращается к service;
-* app собирает всё вместе.
+- domain не знает про HTTP, SQL, Redis и т.п.;
+- service реализует бизнес-логику и работает с репозиториями через интерфейсы;
+- delivery обращается к service;
+- app собирает всё вместе и инициализирует зависимости.
 
 Схематично это выглядит так:
 
 ```
 delivery -> service -> domain
                 |
+           repository
+                |
               infra
 ```
 
-Например, HTTP-хендлер не должен напрямую работать с базой данных.
+То есть:
+
+- delivery принимает входящие запросы (HTTP, gRPC, сообщения из очередей);
+- service реализует бизнес-логику;
+- repository работает с доменными моделями и хранилищем данных;
+- infra предоставляет технические клиенты и интеграции (PostgreSQL, Redis, Kafka и т.п.).
+
+Например, HTTP-хендлер не должен напрямую работать с базой данных — он вызывает сервис, а сервис уже использует репозиторий.
 
 Так легче менять части системы: например заменить PostgreSQL на другую БД или переписать HTTP-слой, не трогая домен и сервисы.
 
@@ -429,18 +561,19 @@ delivery -> service -> domain
 ```bash
 myapp/
 ├── cmd/
-│   └── app/
-│       └── main.go
+│   ├── server/
+│   └── bot/
 ├── configs/
 │   └── config.yml
 ├── internal/
 │   ├── app/
 │   ├── config/
+│   ├── delivery/
 │   ├── domain/
 │   ├── infra/
 │   ├── logger/
-│   ├── service/
-│   └── delivery/
+│   ├── repository/
+│   └── service/
 ├── migrations/
 ├── pkg/
 ├── tests/
@@ -485,4 +618,4 @@ internal/
 
 Но если изначально разделить код на домен, сервисы, инфраструктуру и транспорт, проект гораздо легче масштабировать и поддерживать.
 
-Именно поэтому я чаще всего начинаю новые Go-сервисы с такого каркаса.
+Именно поэтому я чаще всего начинаю новые Go-сервисы с такого каркаса, а затем упрощаю или усложняю его в зависимости от масштаба проекта.

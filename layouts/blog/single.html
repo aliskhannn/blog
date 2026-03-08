@@ -33,6 +33,13 @@
 		{{ end }}
 	</header>
 
+	{{ if .TableOfContents }}
+	<div class="toc">
+		<h2>Содержание</h2>
+		{{ .TableOfContents }}
+	</div>
+	{{ end }}
+
 	<div class="post__content prose markdown-body">
 		{{ .Content }}
 	</div>
