@@ -111,8 +111,7 @@ SQL-миграции для баз данных: создание таблиц, 
 migrations/
 ├── 20260302090925_create_users.sql
 ├── 20260302120917_create_posts.sql
-├── 20260302121545_create_comments.sql
-└── 20260306120308_create_refresh_tokens.sql
+└── 20260306120308_create_sessions.sql
 ```
 
 С этого обычно начинается инфраструктура любого более-менее серьёзного сервиса.
@@ -155,6 +154,7 @@ tests/
     └── repository/
         ├── user_test.go
         ├── post_test.go
+        └── session_test.go
 ```
 
 Здесь обычно лежат тесты, которые поднимают реальную базу данных, HTTP-сервер или другие внешние зависимости.
@@ -193,7 +193,7 @@ internal/
 ├── domain/
 ├── infra/
 ├── logger/
-├── repository
+├── repository/
 └── service/
 ```
 
@@ -235,7 +235,7 @@ internal/
 
 ### internal/domain
 
-Бизнес-модели: пользователи, посты, комментарии и т.п.
+Бизнес-модели: пользователи, посты, сессии и т.п.
 
 Здесь — только данные и бизнес-смысл, без знания о БД, HTTP или Telegram.
 
@@ -245,9 +245,8 @@ internal/
 internal/
 └── domain/
     ├── user.go
-    ├── refresh_token.go
-    ├── post.go
-    └── comment.go
+    ├── session.go
+    └── post.go
 ```
 
 Простейшая модель может выглядеть так:
@@ -319,16 +318,17 @@ func NewPool(cfg Config) (*pgxpool.Pool, error) {
 ```bash
 internal/
 └── repository/
-    └── user/
-        └── user_repository.go
+    ├── user.go
+    ├── session.go
+    └── post.go
 ```
 
 ```go
-type UserRepo struct {
+type User struct {
     db *pgxpool.Pool
 }
 
-func (r *UserRepo) GetByID(ctx context.Context, id int64) (*domain.User, error) {
+func (r *User) GetByID(ctx context.Context, id int64) (*domain.User, error) {
     var user domain.User
 
     query := `SELECT id, email FROM users WHERE id = $1`
