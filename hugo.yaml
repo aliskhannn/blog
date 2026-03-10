@@ -2,6 +2,9 @@ baseURL: "https://aliskhan.ru/"
 languageCode: "ru-RU"
 defaultContentLanguage: "ru"
 title: "Aliskhan's Blog"
+
+enableRobotsTXT: true
+
 pagination:
   pagerSize: 10
 
@@ -17,7 +20,8 @@ params:
     email: "aliskhandev@gmail.com"
     telegram: "https://t.me/aliskhannn"
     github: "https://github.com/aliskhannn"
-    phone: "+7 (938) 014-72-43"
+
+
 
 sitemap:
   changefreq: "weekly"

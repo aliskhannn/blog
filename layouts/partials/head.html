@@ -30,15 +30,17 @@
 <meta name="msapplication-TileColor" content="#2563eb">
 <meta name="theme-color" content="#ffffff">
 
-<meta name="description" content="{{ .Site.Params.description }}">
+<meta name="description"
+	content="{{ if .Description }}{{ .Description }}{{ else }}{{ .Site.Params.description }}{{ end }}">
 <meta name="keywords" content="{{ .Site.Params.keywords }}">
 <meta name="author" content="{{ .Site.Params.author }}">
 
 <!-- Open Graph / Social sharing -->
 <meta property="og:title"
 	content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} · {{ .Site.Title }}{{ end }}">
-<meta property="og:description" content="{{ .Site.Params.description }}">
-<meta property="og:type" content="website">
+<meta property="og:description"
+	content="{{ if .Description }}{{ .Description }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
 <meta property="og:url" content="{{ .Permalink }}">
 <meta property="og:image" content='{{ "images/logo-light.png" | relURL }}'>
 
