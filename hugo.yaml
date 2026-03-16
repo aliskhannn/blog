@@ -11,7 +11,7 @@ pagination:
 params:
   author: "Aliskhan Khutiev"
   info: "Backend-разработчик. Пишу на Go. Делюсь проектами."
-  description: "Блог про backend-разработку на Go, архитектуру сервисов, PostgreSQL, Kafka, распределённые системы и программную инженерию."
+  description: "Блог о Go и backend: практический опыт, разбор проектов и рабочие кейсы из реальной разработки."
   keywords: "golang, go, backend, backend developer, go backend, microservices, clean architecture, REST API, PostgreSQL, Redis, Kafka, RabbitMQ, docker, distributed systems, software engineering, programming blog"
   logoLight: "images/logo-light.png"
   logoDark: "images/logo-dark.png"
