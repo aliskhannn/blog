@@ -21,8 +21,6 @@ params:
     telegram: "https://t.me/aliskhannn"
     github: "https://github.com/aliskhannn"
 
-
-
 sitemap:
   changefreq: "weekly"
   priority: 0.5
